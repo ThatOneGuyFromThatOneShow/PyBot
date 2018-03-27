@@ -1,12 +1,24 @@
 import wpilib
-from wpilib.command import Command
+from wpilib.driverstation import DriverStation
 from commandbased import CommandBasedRobot
+
+from OperatorInput import OperatorInput
+from commands.DriveWIthJoystick import DriveWithJoystick
+from subsystems.drivetrain import Drivetrain
 
 
 class Robot(CommandBasedRobot):
+    operator_input = OperatorInput
+    drivetrain = Drivetrain
 
     def robotInit(self):
         super().robotInit()
+
+        self.drivetrain = Drivetrain()
+        self.operator_input = OperatorInput()
+
+        # Set default commands
+        self.drivetrain.setDefaultCommand(DriveWithJoystick(self.drivetrain, self.operator_input.get_driver()))
 
     def robotPeriodic(self):
         super().robotPeriodic()
@@ -37,4 +49,4 @@ class Robot(CommandBasedRobot):
 
 
 if __name__ == "__main__":
-    wpilib.run(Robot())
+    wpilib.run(Robot)

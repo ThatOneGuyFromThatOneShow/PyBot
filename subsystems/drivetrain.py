@@ -1,10 +1,10 @@
-from wpilib.command.subsystem import Subsystem
-from wpilib.speedcontrollergroup import SpeedControllerGroup
 from ctre.pigeonimu import PigeonIMU
 from ctre.wpi_talonsrx import WPI_TalonSRX
-from robot_map import Drive as DriveMap
+from wpilib.command.subsystem import Subsystem
 from wpilib.drive.differentialdrive import DifferentialDrive
-import commands.DriveWIthJoystick
+from wpilib.speedcontrollergroup import SpeedControllerGroup
+
+from robot_map import Drive as DriveMap
 
 
 class Drivetrain(Subsystem):
@@ -36,9 +36,6 @@ class Drivetrain(Subsystem):
         self.drivetrain = DifferentialDrive(self.left_motors, self.right_motors)
 
         self.pigeon = PigeonIMU(self.left_front_motor)
-
-    def initDefaultCommand(self):
-        self.setDefaultCommand(Dri)
 
     def drive_arcade(self, speed, turn):
         self.drivetrain.arcadeDrive(speed, turn, False)
