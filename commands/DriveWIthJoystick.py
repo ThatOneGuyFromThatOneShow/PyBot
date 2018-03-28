@@ -1,5 +1,5 @@
 from wpilib.command.command import Command
-from subsystems.drivetrain import Drivetrain
+from subsystems.Drivetrain import Drivetrain
 from wpilib.joystick import Joystick
 
 
