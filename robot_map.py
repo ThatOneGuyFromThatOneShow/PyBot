@@ -18,7 +18,7 @@ class Drive:
 
 
 class Compressor:
-    compressor_port = 6
+    compressor_port = 0
 
 
 class Climber:

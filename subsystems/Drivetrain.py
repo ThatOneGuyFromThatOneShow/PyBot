@@ -119,6 +119,7 @@ class Drivetrain(Subsystem):
         deltaLeft = leftEnc - self.lastLeft
         deltaRight = rightEnc - self.lastRight
         deltaTime = curTime - self.lastTime
+        deltaTime = deltaTime if deltaTime != 0 else 1
         leftAcc = deltaLeft * 100 / deltaTime
         rightAcc = deltaRight * 100 / deltaTime
         leftJerk = leftAcc * 100 / deltaTime

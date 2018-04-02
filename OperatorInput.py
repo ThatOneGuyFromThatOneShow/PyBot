@@ -9,6 +9,12 @@ from commands.CloseGrabber import CloseGrabber
 from commands.GrabberGoToPosition import GrabberGoToPosition
 from subsystems.GrabberPosition import GrabberPosition
 from subsystems.LiftHeight import LiftHeight
+from commands.ShiftToLowGear import ShiftToLowGear
+from commands.ShiftToHighGear import ShiftToHighGear
+from commands.Climb import Climb
+from commands.ReverseClimb import ReverseClimb
+from commands.SetLiftSetpoint import SetLiftSetpoint
+from commands.StopClimb import StopClimb
 
 
 class DriverJoystick(Joystick):
@@ -53,13 +59,15 @@ class OperatorInput:
     def get_operator(self):
         return self.operator
 
-    def bind_driver(self, drive: Drivetrain, climber: Climber):
+    def bind_driver(self, drive: Drivetrain, climber: Climber, lift: Lift, grabber: Grabber):
         stick = self.driver
 
-        # stick.shift_low_gear.whenPressed()
-        # stick.shift_high_gear.whenPressed()
-        # stick.climb.whenPressed()
-        # stick.reverse_climb.whenPressed()
+        stick.shift_low_gear.whenPressed(ShiftToLowGear(drive))
+        stick.shift_high_gear.whenPressed(ShiftToHighGear(drive))
+        stick.climb.whenPressed(Climb(climber, lift, grabber))
+        stick.climb.whenReleased(StopClimb(climber))
+        stick.reverse_climb.whenPressed(ReverseClimb(climber))
+        stick.reverse_climb.whenReleased(StopClimb(climber))
 
     def bind_operator(self, lift: Lift, grabber: Grabber):
         stick = self.operator
@@ -71,11 +79,10 @@ class OperatorInput:
         stick.grabber_shoot.whenPressed(GrabberGoToPosition(grabber, GrabberPosition.SHOOT))
         stick.grabber_high.whenPressed(GrabberGoToPosition(grabber, GrabberPosition.HIGH))
 
-        # TODO bind lift
-        # stick.lift_floor.whenPressed()
-        # stick.lift_exchange.whenPressed()
-        # stick.lift_switch.whenPressed()
-        # stick.lift_scale_mid.whenPressed()
-        # stick.lift_scale_high.whenPressed()
+        stick.lift_floor.whenPressed(SetLiftSetpoint(LiftHeight.FLOOR, lift))
+        stick.lift_exchange.whenPressed(SetLiftSetpoint(LiftHeight.EXCHANGE, lift))
+        stick.lift_switch.whenPressed(SetLiftSetpoint(LiftHeight.SWITCH, lift))
+        stick.lift_scale_mid.whenPressed(SetLiftSetpoint(LiftHeight.SCALE_MID, lift))
+        stick.lift_scale_high.whenPressed(SetLiftSetpoint(LiftHeight.SCALE_TOP, lift))
 
 
