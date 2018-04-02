@@ -1,1 +1,5 @@
 /.idea
+/__pycache__
+commands/__pycache__
+field/__pycache__
+subsystems/__pycache__
