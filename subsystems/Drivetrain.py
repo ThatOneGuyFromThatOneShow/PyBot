@@ -5,6 +5,7 @@ from wpilib.drive.differentialdrive import DifferentialDrive
 from wpilib.speedcontrollergroup import SpeedControllerGroup
 from wpilib.doublesolenoid import DoubleSolenoid
 from wpilib.smartdashboard import SmartDashboard
+from wpilib.analoggyro import AnalogGyro
 import time
 import hal
 
@@ -12,17 +13,6 @@ from robot_map import Drive as DriveMap, Compressor as CompressorMap
 
 
 class Drivetrain(Subsystem):
-    left_front_motor: WPI_TalonSRX
-    left_back_motor: WPI_TalonSRX
-    right_front_motor: WPI_TalonSRX
-    right_back_motor: WPI_TalonSRX
-
-    left_motors: SpeedControllerGroup
-    right_motors: SpeedControllerGroup
-
-    drivetrain: DifferentialDrive
-
-    pigeon: PigeonIMU
 
     def __init__(self):
         super().__init__('Drivetrain')
@@ -53,7 +43,10 @@ class Drivetrain(Subsystem):
 
         self.drivetrain = DifferentialDrive(self.left_motors, self.right_motors)
 
-        self.pigeon = PigeonIMU(self.left_front_motor)
+        if not hal.isSimulation():
+            self.pigeon = PigeonIMU(self.left_front_motor)
+        else:
+            self.pigeon = AnalogGyro(0)
 
         self.gear_box = DoubleSolenoid(CompressorMap.compressor_port, DriveMap.gear_box_ports[0],
                                        DriveMap.gear_box_ports[1])
@@ -64,7 +57,7 @@ class Drivetrain(Subsystem):
         self.reset_right_encoder()
 
     def drive_arcade(self, speed, turn):
-        self.drivetrain.arcadeDrive(speed, turn, False)
+        self.drivetrain.arcadeDrive(-speed, turn, False)
 
     def drive_tank(self, left_speed, right_speed):
         self.drivetrain.tankDrive(left_speed, right_speed, False)
@@ -100,13 +93,22 @@ class Drivetrain(Subsystem):
         return self.gear_box.get()
 
     def gyro_read_yaw_angle(self):
-        return self.pigeon.getYawPitchRoll()[0]
+        if not hal.isSimulation():
+            return self.pigeon.getYawPitchRoll()[0]
+        else:
+            return self.pigeon.getAngle()
 
     def gyro_read_yaw_rate(self):
-        return self.pigeon.getRawGyro()[0]
+        if not hal.isSimulation():
+            return self.pigeon.getRawGyro()[0]
+        else:
+            return self.pigeon.getRate()
 
     def gyro_reset(self):
-        self.pigeon.setYaw(0, 0)
+        if not hal.isSimulation():
+            self.pigeon.setYaw(0, 0)
+        else:
+            self.pigeon.reset()
 
     lastTime = 0
     lastLeft, lastRight, maxLeftAcc, maxRightAcc, maxLeftJerk, maxRightJerk, maxLeftSpeed, maxRightSpeed =\
@@ -146,7 +148,7 @@ class Drivetrain(Subsystem):
         SmartDashboard.putNumber("Max Left Speed", self.maxLeftSpeed)
         SmartDashboard.putNumber("Max Right Speed", self.maxRightSpeed)
 
-        SmartDashboard.putNumber("Left Encoder", self.get_left_velocity())
+        SmartDashboard.putNumber("Left Encoder", self.get_left_encoder())
         SmartDashboard.putNumber("Right Encoder", self.get_right_encoder())
         SmartDashboard.putNumber("Left Velocity", leftEnc)
         SmartDashboard.putNumber("Right Velocity", rightEnc)

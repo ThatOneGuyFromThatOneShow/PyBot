@@ -8,6 +8,7 @@ from robot_map import DashboardKeys
 from subsystems.Drivetrain import Drivetrain
 from subsystems.Grabber import Grabber
 from subsystems.Lift import Lift
+import sys
 
 
 class FieldAnalyzer:
@@ -33,7 +34,7 @@ class FieldAnalyzer:
         print(strategy_string + "\n" + self.robot_starting_pos.name)
 
         for s in Strategy:
-            if self.strategy_picked_chars[s.value] == 'y':
+            if self.strategy_picked_chars[s.value] == 'y' or s == Strategy.DRIVE_FORWARD:
                 points = Waypoints.WAYPOINTS[self.robot_starting_pos][s]
 
                 auto = AutoCommand(points, s, self.drivetrain, self.lift, self.grabber)
@@ -47,7 +48,9 @@ class FieldAnalyzer:
             self.pick_strategy('r', 'l')
         else:
             self.pick_strategy('l', 'r')
-        self.picked_auto = self.strategy_options[self.picked_strategy]
+
+        if self.strategy_options != {}:
+            self.picked_auto = self.strategy_options[self.picked_strategy]
 
     def pick_strategy(self, sameChar, oppositeChar):
         if self.field_pos[0] == sameChar and Strategy.SWITCH_SAME in self.strategy_options:
@@ -67,6 +70,7 @@ class FieldAnalyzer:
     def run_auto(self):
         if self.picked_auto is not None:
             self.picked_auto.start()
+        print(self.get_picked_strategy().name)
 
     def stop_auto(self):
         if self.picked_auto is not None:

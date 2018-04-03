@@ -1,5 +1,6 @@
 import math
 import time
+import hal
 
 from wpilib.command.command import Command
 
@@ -26,7 +27,7 @@ class GoToDistance(Command):
         self.start_angle = None
         self.last_move = None
 
-        print("Distance: " + distance)
+        print("Distance: " + str(distance))
 
     def initialize(self):
         self.start_angle = self.drivetrain.gyro_read_yaw_angle()
@@ -37,21 +38,19 @@ class GoToDistance(Command):
     def execute(self):
         angle_dif = self.start_angle - self.drivetrain.gyro_read_yaw_angle()
         correction = angle_dif / 50
-        cur_distance = (self.drivetrain.get_left_encoder() - self.left_start +
-                        self.drivetrain.get_right_encoder() - self.right_start) / 2
+        cur_distance = (self.drivetrain.get_left_encoder() - self.left_start)
         calc_speed = max(self.ramp(abs(cur_distance)), 0)
 
         self.drivetrain.drive_tank(calc_speed - correction, calc_speed + correction)
 
-        if abs((self.drivetrain.get_left_velocity() + self.drivetrain.get_right_velocity()) / 2) > 20:
+        if abs((self.drivetrain.get_left_velocity())) > 20:
             self.last_move = time.time()
 
-        print("Speed: " + calc_speed + "\nCurrent Distance: " + cur_distance)
+        print("Speed: " + str(calc_speed) + "\nCurrent Distance: " + str(cur_distance))
 
     def isFinished(self):
-        cur_distance = (self.drivetrain.get_left_encoder() - self.left_start +
-                        self.drivetrain.get_right_encoder() - self.right_start) / 2
-        return (abs(cur_distance) >= self.distance) or (time.time() - self.last_move > 1000)
+        cur_distance = (self.drivetrain.get_left_encoder() - self.left_start)
+        return (abs(cur_distance) >= self.distance) or ((time.time() - self.last_move > 1) if not hal.isSimulation() else False)
 
     def end(self):
         self.drivetrain.drive_tank(0, 0)

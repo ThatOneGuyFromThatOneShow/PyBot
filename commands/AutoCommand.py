@@ -40,7 +40,7 @@ class AutoCommand(CommandGroup):
 
         for point in points:
             x = (point.x * METERS_TO_FEET - 1 if is_first else point.x * METERS_TO_FEET) - self.cur_absolute_x
-            y = self.cur_absolute_y - point.y * METERS_TO_FEET
+            y = self.cur_absolute_y - (point.y * METERS_TO_FEET)
             distance = math.sqrt(x*x + y*y)
             is_first = False
 
@@ -49,8 +49,7 @@ class AutoCommand(CommandGroup):
             elif x == 0 and y < 0:
                 self.turn(-90)
             elif x > 0 and y == 0:
-                # self.turn(0)
-                pass
+                self.turn(0)
             elif x < 0 and y == 0:
                 self.turn(180)
             elif x > 0 and y > 0:
@@ -65,7 +64,6 @@ class AutoCommand(CommandGroup):
             self.cur_absolute_x += x
             self.cur_absolute_y -= y
             self.addSequential(Wait(200))
-            print("Adding distance: " + str(distance))
             self.addSequential(GoToDistance(MOVE_SPEED, distance, drivetrain))
 
         self.addSequential(Wait(200))

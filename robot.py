@@ -129,7 +129,8 @@ class Robot(CommandBasedRobot):
         self.grabber.capture_cube()
 
         # Analyze the field and pick auto
-        field_pos = [char for char in DriverStation.getInstance().getGameSpecificMessage().upper()]
+        field_pos = [char for char in DriverStation.getInstance().getGameSpecificMessage().lower()]
+        print(str(field_pos))
         self.field_analyzer.set_field_position(field_pos)
         self.field_analyzer.calculate_strategy()
         self.field_analyzer.run_auto()
